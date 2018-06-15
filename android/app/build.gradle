@@ -95,14 +95,19 @@ def enableProguardInReleaseBuilds = false
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId "com.rnandroidhipsdk"
-        minSdkVersion 16
+        minSdkVersion 18
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
+        //Mobile keys build configurations @see gradle.properties
+        buildConfigField "String", "AAMK_APP_ID", AAMK_APP_ID
+        buildConfigField "String", "AAMK_APP_ID_DESCRIPTION", AAMK_APP_ID_DESCRIPTION
+        buildConfigField "int", "AAMK_LOCK_SERVICE_CODE", AAMK_LOCK_SERVICE_CODE
+        buildConfigField "String", "AAMK_EMAIL_LOGS_MAIL", AAMK_EMAIL_LOGS_MAIL
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -135,11 +140,33 @@ android {
         }
     }
 }
+repositories { //note that repositories are prioritized in the order they appear
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 
 dependencies {
-    compile fileTree(dir: "libs", include: ["*.jar"])
-    compile "com.android.support:appcompat-v7:23.0.1"
-    compile "com.facebook.react:react-native:+"  // From node_modules
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "com.android.support:appcompat-v7:23.0.1"
+    implementation "com.facebook.react:react-native:+"  // From node_modules
+    debugImplementation(group: 'com.assaabloy.mobilekeys.api', name: 'mobilekeys-android-sdk-debug', version: '6.5.+', ext: 'aar')
+    releaseImplementation(group: 'com.assaabloy.mobilekeys.api', name: 'mobilekeys-android-sdk-release', version: '6.5.+', ext: 'aar')
+
+    // Mobile Keys SDK transitive dependencies
+    implementation "org.bouncycastle:bcprov-jdk15on:1.58"
+    implementation "com.google.code.gson:gson:2.8.2"
+    implementation "org.slf4j:slf4j-api:1.7.25"
+    //You can depend on 5.2.1 if your application depend on support-v4 (verified drop-in replacement).
+    implementation "com.mixpanel.android:mixpanel-android:4.8.7@aar"
+    implementation "com.squareup.okhttp3:okhttp:3.9.1"
+
+    // Logging in debug builds
+    debugImplementation 'com.github.tony19:logback-android-core:1.1.1-6'
+    debugImplementation ('com.github.tony19:logback-android-classic:1.1.1-6') {
+        exclude group: 'com.google.android', module: 'android'
+    }
 }
 
 // Run this once to be able to run the application with BUCK

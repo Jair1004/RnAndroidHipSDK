@@ -9,8 +9,11 @@ import {
   Platform,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from 'react-native';
+
+import HidSdkBridge from './HidSdkBridge';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' +
@@ -21,18 +24,23 @@ const instructions = Platform.select({
 
 type Props = {};
 export default class App extends Component<Props> {
+  _callInitializeMobileKeysApi = () => {
+    HidSdkBridge.initializeMobileKeysApi();
+  }
+
+  _callToast = () => {
+    HidSdkBridge.show('Awesome');
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit App.js
-        </Text>
-        <Text style={styles.instructions}>
-          {instructions}
-        </Text>
+        <TouchableOpacity onPress={this._callInitializeMobileKeysApi} style={{margin : 20}}>
+          <Text>Call initializeMobileKeysApi</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={this._callToast} style={{margin : 20}}>
+          <Text>Test Toast</Text>
+        </TouchableOpacity>
       </View>
     );
   }
